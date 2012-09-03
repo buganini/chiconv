@@ -1,10 +1,11 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <bsdconv.h>
 
 #define IBUFLEN 1024
 
-double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff);
-int execute(struct bsdconv_instance *ins, int fd, size_t len);
+static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff);
+static void usage(void);
 
 struct codec {
 	struct bsdconv_instance *evl;
@@ -38,8 +39,31 @@ int main(int argc, char *argv[]){
 	};
 	int i, max, max_i;
 	size_t len;
-	char *ib=malloc(bufsiz);
+	char *ib;
+	char outenc;
+	int ch;
 
+	while ((ch = getopt(argc, argv, "bgs:")) != -1)
+		switch(ch) {
+		case 'b':
+			outenc='b';
+			break;
+		case 'g':
+			outenc='g';
+			break;
+		case 's':
+			if(sscanf(optarg, "%d", &i)!=1)
+				usage();
+			bufsiz=i;
+			break;
+		case '?':
+		default:
+			usage();
+		}
+	argc -= optind;
+	argv += optind;
+
+	ib=malloc(bufsiz);
 	len=fread(ib, 1, bufsiz, stdin);
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
@@ -77,12 +101,24 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff){
+static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff){
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags=0;
 	ins->input.len=len;
 	ins->output_mode=BSDCONV_NULL;
 	bsdconv(ins);
-	return ins->score * coeff - ins->ierr * 10 - ins->oerr;
+	return ins->score * coeff * (len/16384) - ins->ierr * 10 - ins->oerr;
+}
+
+static void
+usage(void)
+{
+	(void)fprintf(stderr,
+	    "usage: chiconv [-bg] [-i bufsiz]\n"
+	    "\t -b\tOutput Big5\n"
+	    "\t -g\tOutput GBK\n"
+	    "\t -s\tbuffer size, default=8192\n"
+	);
+	exit(1);
 }
