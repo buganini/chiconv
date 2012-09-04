@@ -1,10 +1,15 @@
-CFLAGS=-g -Wall -I/usr/include
-LIBS=-L/usr/lib -lbsdconv
+PREFIX?=/usr
+
+CFLAGS=-g -Wall -I${PREFIX}/include
+LIBS=-L${PREFIX}/lib -lbsdconv
 
 all: chiconv
 
 chiconv: chiconv.c
 	$(CC) ${CFLAGS} -o chiconv chiconv.c ${LIBS}
+
+install:
+	install -m 555 chiconv ${PREFIX}/bin
 
 clean:
 	rm -f chiconv
