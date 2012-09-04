@@ -6,6 +6,7 @@
 
 static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff);
 static void usage(void);
+static void finish(int r);
 
 struct codec {
 	struct bsdconv_instance *evl;
@@ -14,34 +15,31 @@ struct codec {
 	double coeff;
 };
 
+struct codec codecs[3];
+
 int main(int argc, char *argv[]){
 	struct bsdconv_instance *ins;
 	size_t bufsiz=8192;
-	struct codec codecs[]={
-		{
-			.evl=bsdconv_create("utf-8:score:null"),
-			.ins=bsdconv_create("utf-8:utf-8"),
-			.score=0,
-			.coeff=2.5
-		},
-		{
-			.evl=bsdconv_create("big5:score:null"),
-			.ins=bsdconv_create("big5:utf-8"),
-			.score=0,
-			.coeff=1.5
-		},
-		{
-			.evl=bsdconv_create("gbk:score:null"),
-			.ins=bsdconv_create("gbk:utf-8"),
-			.score=0,
-			.coeff=1.5
-		}
-	};
 	int i, max, max_i;
 	size_t len;
 	char *ib;
 	char outenc='u';
 	int ch;
+
+	codecs[0].evl=bsdconv_create("utf-8:score:null");
+	codecs[0].ins=bsdconv_create("utf-8:utf-8");
+	codecs[0].score=0;
+	codecs[0].coeff=2.5;
+
+	codecs[1].evl=bsdconv_create("big5:score:null");
+	codecs[1].ins=bsdconv_create("big5:utf-8");
+	codecs[1].score=0;
+	codecs[1].coeff=1.5;
+
+	codecs[2].evl=bsdconv_create("gbk:score:null");
+	codecs[2].ins=bsdconv_create("gbk:utf-8");
+	codecs[2].score=0;
+	codecs[2].coeff=1.5;
 
 	while ((ch = getopt(argc, argv, "bgs:")) != -1)
 		switch(ch) {
@@ -108,6 +106,8 @@ int main(int argc, char *argv[]){
 		bsdconv(ins);
 	}while(ins->flush==0);
 
+	finish(0);
+
 	return 0;
 }
 
@@ -121,14 +121,22 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, doubl
 	return ins->score * coeff * (len/16384) - ins->ierr * 10 - ins->oerr;
 }
 
-static void
-usage(void)
-{
+static void usage(void){
 	(void)fprintf(stderr,
 	    "usage: chiconv [-bg] [-i bufsiz]\n"
 	    "\t -b\tOutput Big5\n"
 	    "\t -g\tOutput GBK\n"
 	    "\t -s\tbuffer size, default=8192\n"
 	);
-	exit(1);
+	finish(1);
+}
+
+static void finish(int r){
+	int i;
+	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+		bsdconv_destroy(codecs[i].evl);
+		bsdconv_destroy(codecs[i].ins);
+	}
+	exit(r);
+
 }
