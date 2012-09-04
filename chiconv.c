@@ -23,7 +23,7 @@ int main(int argc, char *argv[]){
 	int i, max, max_i;
 	size_t len;
 	char *ib;
-	char outenc='u';
+	char outenc='8';
 	int ch;
 
 	codecs[0].evl=bsdconv_create("utf-8:score:null");
@@ -41,10 +41,13 @@ int main(int argc, char *argv[]){
 	codecs[2].score=0;
 	codecs[2].coeff=1.5;
 
-	while ((ch = getopt(argc, argv, "bgs:")) != -1)
+	while ((ch = getopt(argc, argv, "bugs:")) != -1)
 		switch(ch) {
 		case 'b':
 			outenc='b';
+			break;
+		case 'u':
+			outenc='u';
 			break;
 		case 'g':
 			outenc='g';
@@ -81,6 +84,9 @@ int main(int argc, char *argv[]){
 	switch(outenc){
 		case 'b':
 			bsdconv_replace_phase(ins, "_CP950,CP950_TRANS,ASCII", TO, 1);
+			break;
+		case 'u':
+			bsdconv_replace_phase(ins, "_CP950,_UAO250,CP950_TRANS,ASCII", TO, 1);
 			break;
 		case 'g':
 			bsdconv_replace_phase(ins, "_GBK,CP936_TRANS,ASCII", TO, 1);
@@ -123,10 +129,11 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, doubl
 
 static void usage(void){
 	(void)fprintf(stderr,
-	    "usage: chiconv [-bg] [-i bufsiz]\n"
+	    "usage: chiconv [-bug] [-i bufsiz]\n"
 	    "\t -b\tOutput Big5\n"
+	    "\t -u\tOutput Big5 with UAO exntension\n"
 	    "\t -g\tOutput GBK\n"
-	    "\t -s\tbuffer size, default=8192\n"
+	    "\t -s\tbuffer size used for encoding detection, default=8192\n"
 	);
 	finish(1);
 }
