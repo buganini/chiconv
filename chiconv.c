@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 	int i, max, max_i;
 	size_t len;
 	char *ib;
-	char outenc;
+	char outenc='u';
 	int ch;
 
 	while ((ch = getopt(argc, argv, "bgs:")) != -1)
@@ -79,6 +79,16 @@ int main(int argc, char *argv[]){
 	}
 
 	ins=codecs[max_i].ins;
+
+	switch(outenc){
+		case 'b':
+			bsdconv_replace_phase(ins, "_CP950,CP950_TRANS,ASCII", TO, 1);
+			break;
+		case 'g':
+			bsdconv_replace_phase(ins, "_GBK,CP936_TRANS,ASCII", TO, 1);
+			break;
+	}
+
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags|=F_FREE;
