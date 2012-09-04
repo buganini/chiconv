@@ -1,4 +1,4 @@
-PREFIX?=/usr
+PREFIX?=/usr/local
 
 CFLAGS=-g -Wall -I${PREFIX}/include
 LIBS=-L${PREFIX}/lib -lbsdconv
