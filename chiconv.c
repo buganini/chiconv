@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <bsdconv.h>
 
@@ -10,7 +11,7 @@ static void finish(int r);
 
 struct codec {
 	struct bsdconv_instance *evl;
-	struct bsdconv_instance *ins;
+	char *conv;
 	double score;
 	double coeff;
 };
@@ -18,6 +19,7 @@ struct codec {
 struct codec codecs[3];
 
 int main(int argc, char *argv[]){
+	char *conv;
 	struct bsdconv_instance *ins;
 	size_t bufsiz=8192;
 	int i, max, max_i;
@@ -27,17 +29,17 @@ int main(int argc, char *argv[]){
 	int ch;
 
 	codecs[0].evl=bsdconv_create("utf-8:score:null");
-	codecs[0].ins=bsdconv_create("utf-8:utf-8");
+	codecs[0].conv="utf-8:utf-8";
 	codecs[0].score=0;
 	codecs[0].coeff=2.5;
 
 	codecs[1].evl=bsdconv_create("big5:score:null");
-	codecs[1].ins=bsdconv_create("big5:utf-8");
+	codecs[1].conv="big5:utf-8";
 	codecs[1].score=0;
 	codecs[1].coeff=1.5;
 
 	codecs[2].evl=bsdconv_create("gbk:score:null");
-	codecs[2].ins=bsdconv_create("gbk:utf-8");
+	codecs[2].conv="gbk:utf-8";
 	codecs[2].score=0;
 	codecs[2].coeff=1.5;
 
@@ -79,20 +81,24 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	ins=codecs[max_i].ins;
+	conv=codecs[max_i].conv;
 
 	switch(outenc){
 		case 'b':
-			bsdconv_replace_phase(ins, "_CP950,CP950_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_CP950,CP950_TRANS,ASCII", TO, 1);
 			break;
 		case 'u':
-			bsdconv_replace_phase(ins, "_CP950,_UAO250,CP950_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950_TRANS,ASCII", TO, 1);
 			break;
 		case 'g':
-			bsdconv_replace_phase(ins, "_GBK,CP936_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_GBK,CP936_TRANS,ASCII", TO, 1);
+			break;
+		default:
+			conv=strdup(conv);
 			break;
 	}
-
+	ins=bsdconv_create(conv);
+	bsdconv_free(conv);
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags|=F_FREE;
@@ -111,6 +117,7 @@ int main(int argc, char *argv[]){
 		ins->output.data=stdout;
 		bsdconv(ins);
 	}while(ins->flush==0);
+	bsdconv_destroy(ins);
 
 	finish(0);
 
@@ -142,7 +149,6 @@ static void finish(int r){
 	int i;
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
 		bsdconv_destroy(codecs[i].evl);
-		bsdconv_destroy(codecs[i].ins);
 	}
 	exit(r);
 
