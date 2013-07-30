@@ -5,7 +5,7 @@
 
 #define IBUFLEN 1024
 
-static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff);
+static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len);
 static void usage(void);
 static void finish(int r);
 
@@ -28,20 +28,17 @@ int main(int argc, char *argv[]){
 	char outenc='8';
 	int ch;
 
-	codecs[0].evl=bsdconv_create("utf-8:score:null");
+	codecs[0].evl=bsdconv_create("utf-8:score:count:null");
 	codecs[0].conv="utf-8:utf-8";
 	codecs[0].score=0;
-	codecs[0].coeff=2.5;
 
-	codecs[1].evl=bsdconv_create("big5:score:null");
+	codecs[1].evl=bsdconv_create("big5:score:count:null");
 	codecs[1].conv="big5:utf-8";
 	codecs[1].score=0;
-	codecs[1].coeff=1.5;
 
-	codecs[2].evl=bsdconv_create("gbk:score:null");
+	codecs[2].evl=bsdconv_create("gbk:score:count:null");
 	codecs[2].conv="gbk:utf-8";
 	codecs[2].score=0;
-	codecs[2].coeff=1.5;
 
 	while ((ch = getopt(argc, argv, "bugs:")) != -1)
 		switch(ch) {
@@ -70,7 +67,7 @@ int main(int argc, char *argv[]){
 	len=fread(ib, 1, bufsiz, stdin);
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
-		codecs[i].score=evaluate(codecs[i].evl, ib, len, codecs[i].coeff);
+		codecs[i].score=evaluate(codecs[i].evl, ib, len);
 	}
 	max=codecs[0].score;
 	max_i=0;
@@ -124,14 +121,20 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
-static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len, double coeff){
+static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
+	bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
+	bsdconv_counter_t *_score=bsdconv_counter(ins, "SCORE");
+	bsdconv_counter_t *_count=bsdconv_counter(ins, "COUNT");
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags=0;
 	ins->input.len=len;
 	ins->output_mode=BSDCONV_NULL;
 	bsdconv(ins);
-	return ins->score * coeff * (len/16384) - ins->ierr * 10 - ins->oerr;
+	double ierr=(double)(*_ierr);
+	double score=(double)(*_score);
+	double count=(double)(*_count);
+	return score/count - (ierr*10)/count;
 }
 
 static void usage(void){
