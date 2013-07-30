@@ -2,7 +2,9 @@ Usage:
 	chiconv < infile > outfile
 
 Support encoding:
+	UTF-8
 	BIG5
+	CCCII
 	GBK
 	GB18030
 	UTF-16LE
