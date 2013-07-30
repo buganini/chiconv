@@ -16,7 +16,7 @@ struct codec {
 	double coeff;
 };
 
-struct codec codecs[3];
+struct codec codecs[9];
 
 int main(int argc, char *argv[]){
 	char *conv;
@@ -39,6 +39,30 @@ int main(int argc, char *argv[]){
 	codecs[2].evl=bsdconv_create("gbk:score:count:null");
 	codecs[2].conv="gbk:utf-8";
 	codecs[2].score=0;
+
+	codecs[3].evl=bsdconv_create("cccii:score:count:null");
+	codecs[3].conv="cccii:utf-8";
+	codecs[3].score=0;
+
+	codecs[4].evl=bsdconv_create("utf-16le:score:count:null");
+	codecs[4].conv="utf-16le:utf-8";
+	codecs[4].score=0;
+
+	codecs[5].evl=bsdconv_create("utf-16be:score:count:null");
+	codecs[5].conv="utf-16be:utf-8";
+	codecs[5].score=0;
+
+	codecs[6].evl=bsdconv_create("utf-32le:score:count:null");
+	codecs[6].conv="utf-32le:utf-8";
+	codecs[6].score=0;
+
+	codecs[7].evl=bsdconv_create("utf-32be:score:count:null");
+	codecs[7].conv="utf-32be:utf-8";
+	codecs[7].score=0;
+
+	codecs[8].evl=bsdconv_create("gb18030:score:count:null");
+	codecs[8].conv="gb18030:utf-8";
+	codecs[8].score=0;
 
 	while ((ch = getopt(argc, argv, "bugs:")) != -1)
 		switch(ch) {
