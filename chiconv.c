@@ -174,7 +174,7 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
 	double ierr=(double)(*_ierr);
 	double score=(double)(*_score);
 	double count=(double)(*_count);
-	return score/count - (ierr*10)/count;
+	return (score - ierr*10)/count;
 }
 
 static void usage(void){
