@@ -46,39 +46,30 @@ int main(int argc, char *argv[]){
 
 	codecs[0].evl=bsdconv_create("utf-8:score:count:null");
 	codecs[0].conv="utf-8:nobom:utf-8";
-	codecs[0].score=0;
 
 	codecs[1].evl=bsdconv_create("big5:score:count:null");
 	codecs[1].conv="big5:utf-8";
-	codecs[1].score=0;
 
 	codecs[2].evl=bsdconv_create("gbk:score:count:null");
 	codecs[2].conv="gbk:utf-8";
-	codecs[2].score=0;
 
 	codecs[3].evl=bsdconv_create("cccii:score:count:null");
 	codecs[3].conv="cccii:utf-8";
-	codecs[3].score=0;
 
 	codecs[4].evl=bsdconv_create("utf-16le:score:count:null");
 	codecs[4].conv="utf-16le:nobom:utf-8";
-	codecs[4].score=0;
 
 	codecs[5].evl=bsdconv_create("utf-16be:score:count:null");
 	codecs[5].conv="utf-16be:nobom:utf-8";
-	codecs[5].score=0;
 
 	codecs[6].evl=bsdconv_create("utf-32le:score:count:null");
 	codecs[6].conv="utf-32le:nobom:utf-8";
-	codecs[6].score=0;
 
 	codecs[7].evl=bsdconv_create("utf-32be:score:count:null");
 	codecs[7].conv="utf-32be:nobom:utf-8";
-	codecs[7].score=0;
 
 	codecs[8].evl=bsdconv_create("gb18030:score:count:null");
 	codecs[8].conv="gb18030:utf-8";
-	codecs[8].score=0;
 
 	while ((ch = getopt(argc, argv, "bugs:")) != -1)
 		switch(ch) {
