@@ -113,13 +113,13 @@ int main(int argc, char *argv[]){
 
 	switch(outenc){
 		case 'b':
-			conv=bsdconv_replace_phase(conv, "_CP950,CP950_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_CP950,CP950-TRANS,ASCII", TO, 1);
 			break;
 		case 'u':
-			conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950-TRANS,ASCII", TO, 1);
 			break;
 		case 'g':
-			conv=bsdconv_replace_phase(conv, "_GBK,CP936_TRANS,ASCII", TO, 1);
+			conv=bsdconv_replace_phase(conv, "_GBK,CP936-TRANS,ASCII", TO, 1);
 			break;
 		default:
 			conv=strdup(conv);
