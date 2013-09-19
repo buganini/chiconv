@@ -130,6 +130,7 @@ int main(int argc, char *argv[]){
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags|=F_FREE;
+	ins->input.next=NULL;
 	ins->input.len=len;
 	ins->output_mode=BSDCONV_FILE;
 	ins->output.data=stdout;
@@ -138,6 +139,7 @@ int main(int argc, char *argv[]){
 		ib=malloc(IBUFLEN);
 		ins->input.data=ib;
 		ins->input.flags|=F_FREE;
+		ins->input.next=NULL;
 		if((ins->input.len=fread(ib, 1, IBUFLEN, stdin))==0){
 			ins->flush=1;
 		}
@@ -159,6 +161,7 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags=0;
+	ins->input.next=NULL;
 	ins->input.len=len;
 	ins->output_mode=BSDCONV_NULL;
 	bsdconv(ins);
