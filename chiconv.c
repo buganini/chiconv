@@ -16,63 +16,86 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <bsdconv.h>
 
 #define IBUFLEN 1024
 
+static bsdconv_counter_t process(FILE *, FILE *);
 static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len);
 static void usage(void);
 static void finish(int r);
 
 struct codec {
 	struct bsdconv_instance *evl;
+	struct bsdconv_instance *ins;
 	char *conv;
 	double score;
 	double coeff;
 };
 
 struct codec codecs[9];
+char outenc;
+size_t bufsiz;
 
 int main(int argc, char *argv[]){
-	char *conv;
-	struct bsdconv_instance *ins;
-	size_t bufsiz=8192;
-	int i, max, max_i;
-	size_t len;
-	char *ib;
-	char outenc='8';
 	int ch;
+	int i;
+	bsdconv_counter_t e;
+	char inplace=0;
+	char *tmp;
+	int fd;
+	FILE *fi, *fo;
+
+	bufsiz=8192;
+	outenc ='8';
 
 	codecs[0].evl=bsdconv_create("utf-8:score:count:null");
 	codecs[0].conv="utf-8:nobom:utf-8";
+	codecs[0].ins=NULL;
 
 	codecs[1].evl=bsdconv_create("big5:score:count:null");
 	codecs[1].conv="big5:utf-8";
+	codecs[1].ins=NULL;
 
 	codecs[2].evl=bsdconv_create("gbk:score:count:null");
 	codecs[2].conv="gbk:utf-8";
+	codecs[2].ins=NULL;
 
 	codecs[3].evl=bsdconv_create("cccii:score:count:null");
 	codecs[3].conv="cccii:utf-8";
+	codecs[3].ins=NULL;
 
 	codecs[4].evl=bsdconv_create("utf-16le:score:count:null");
 	codecs[4].conv="utf-16le:nobom:utf-8";
+	codecs[4].ins=NULL;
 
 	codecs[5].evl=bsdconv_create("utf-16be:score:count:null");
 	codecs[5].conv="utf-16be:nobom:utf-8";
+	codecs[5].ins=NULL;
 
 	codecs[6].evl=bsdconv_create("utf-32le:score:count:null");
 	codecs[6].conv="utf-32le:nobom:utf-8";
+	codecs[6].ins=NULL;
 
 	codecs[7].evl=bsdconv_create("utf-32be:score:count:null");
 	codecs[7].conv="utf-32be:nobom:utf-8";
+	codecs[7].ins=NULL;
 
 	codecs[8].evl=bsdconv_create("gb18030:score:count:null");
 	codecs[8].conv="gb18030:utf-8";
+	codecs[8].ins=NULL;
 
-	while ((ch = getopt(argc, argv, "bugs:")) != -1)
+	while ((ch = getopt(argc, argv, "ifbugs:")) != -1)
 		switch(ch) {
+		case 'i':
+			inplace=1;
+			break;
+		case 'f':
+			inplace=2;
+			break;
 		case 'b':
 			outenc='b';
 			break;
@@ -91,11 +114,71 @@ int main(int argc, char *argv[]){
 		default:
 			usage();
 		}
-	argc -= optind;
-	argv += optind;
+
+#ifdef WIN32
+	setmode(STDIN_FILENO, O_BINARY);
+	setmode(STDOUT_FILENO, O_BINARY);
+#endif
+
+	if(optind<argc){
+		for(;optind<argc;optind++){
+			fi=fopen(argv[optind],"rb");
+			if(inplace==0){
+				process(fi, stdout);
+				fclose(fi);
+			}else{
+				tmp=malloc(strlen(argv[optind])+8);
+				strcpy(tmp, argv[optind]);
+				strcat(tmp, ".XXXXXX");
+				if((fd=mkstemp(tmp))==-1){
+					free(tmp);
+					fprintf(stderr, "Failed creating temp file.\n");
+					fclose(fi);
+					continue;
+				}
+				fo=fdopen(fd, "wb");
+				if(!fo){
+					fprintf(stderr, "Unable to open output file for %s\n", argv[optind]);
+					fclose(fi);
+					continue;
+				}
+#ifndef WIN32
+				struct stat stat;
+				fstat(fileno(fi), &stat);
+				fchown(fileno(fo), stat.st_uid, stat.st_gid);
+				fchmod(fileno(fo), stat.st_mode);
+#endif
+				e=process(fi, fo);
+				fclose(fi);
+				fclose(fo);
+				if(e==0 || inplace==2){
+					unlink(argv[optind]);
+					rename(tmp,argv[optind]);
+				}else{
+					unlink(tmp);
+				}
+				free(tmp);
+			}
+		}
+	}else{
+		process(stdin, stdout);
+	}
+
+	finish(0);
+
+	return 0;
+}
+
+static bsdconv_counter_t process(FILE *fi, FILE *fo){
+	char *conv;
+	struct bsdconv_instance *ins;
+	int i, max, max_i;
+	char *ib;
+	size_t len;
+	bsdconv_counter_t *e;
 
 	ib=malloc(bufsiz);
-	len=fread(ib, 1, bufsiz, stdin);
+	len=fread(ib, 1, bufsiz, fi);
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
 		codecs[i].score=evaluate(codecs[i].evl, ib, len);
@@ -109,55 +192,57 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-	conv=codecs[max_i].conv;
-
-	switch(outenc){
-		case 'b':
-			conv=bsdconv_replace_phase(conv, "_CP950,CP950-TRANS,ASCII", TO, 1);
-			break;
-		case 'u':
-			conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950-TRANS,ASCII", TO, 1);
-			break;
-		case 'g':
-			conv=bsdconv_replace_phase(conv, "_GBK,CP936-TRANS,ASCII", TO, 1);
-			break;
-		default:
-			conv=strdup(conv);
-			break;
+	if(codecs[max_i].ins){
+		ins=codecs[max_i].ins;
+	}else{
+		conv=codecs[max_i].conv;
+		switch(outenc){
+			case 'b':
+				conv=bsdconv_replace_phase(conv, "_CP950,CP950-TRANS,ASCII", TO, 1);
+				break;
+			case 'u':
+				conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950-TRANS,ASCII", TO, 1);
+				break;
+			case 'g':
+				conv=bsdconv_replace_phase(conv, "_GBK,CP936-TRANS,ASCII", TO, 1);
+				break;
+			default:
+				conv=strdup(conv);
+				break;
+		}
+		codecs[max_i].ins=ins=bsdconv_create(conv);
+		bsdconv_free(conv);
 	}
-	ins=bsdconv_create(conv);
-	bsdconv_free(conv);
+	bsdconv_counter_reset(ins, NULL);
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags|=F_FREE;
 	ins->input.next=NULL;
 	ins->input.len=len;
 	ins->output_mode=BSDCONV_FILE;
-	ins->output.data=stdout;
+	ins->output.data=fo;
 	bsdconv(ins);
 	do{
 		ib=malloc(IBUFLEN);
 		ins->input.data=ib;
 		ins->input.flags|=F_FREE;
 		ins->input.next=NULL;
-		if((ins->input.len=fread(ib, 1, IBUFLEN, stdin))==0){
+		if((ins->input.len=fread(ib, 1, IBUFLEN, fi))==0){
 			ins->flush=1;
 		}
 		ins->output_mode=BSDCONV_FILE;
-		ins->output.data=stdout;
+		ins->output.data=fo;
 		bsdconv(ins);
 	}while(ins->flush==0);
-	bsdconv_destroy(ins);
-
-	finish(0);
-
-	return 0;
+	e=bsdconv_counter(ins, "IERR");
+	return *e;
 }
 
 static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
 	bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
 	bsdconv_counter_t *_score=bsdconv_counter(ins, "SCORE");
 	bsdconv_counter_t *_count=bsdconv_counter(ins, "COUNT");
+	bsdconv_counter_reset(ins, NULL);
 	bsdconv_init(ins);
 	ins->input.data=ib;
 	ins->input.flags=0;
@@ -174,6 +259,8 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
 static void usage(void){
 	(void)fprintf(stderr,
 	    "usage: chiconv [-bug] [-i bufsiz]\n"
+	    "\t -i\tsave in-place if no error\n"
+	    "\t -f\tsave in-place (implies -i)\n"
 	    "\t -b\tOutput Big5\n"
 	    "\t -u\tOutput Big5 with UAO exntension\n"
 	    "\t -g\tOutput GBK\n"
@@ -186,6 +273,8 @@ static void finish(int r){
 	int i;
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
 		bsdconv_destroy(codecs[i].evl);
+		if(codecs[i].ins)
+			bsdconv_destroy(codecs[i].ins);
 	}
 	exit(r);
 
