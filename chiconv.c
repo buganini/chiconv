@@ -155,6 +155,7 @@ int main(int argc, char *argv[]){
 					unlink(argv[optind]);
 					rename(tmp,argv[optind]);
 				}else{
+					fprintf(stderr, "Skipping %s (%zu error(s))\n", argv[optind], e);
 					unlink(tmp);
 				}
 				free(tmp);
