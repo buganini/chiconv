@@ -261,7 +261,7 @@ static void usage(void){
 	(void)fprintf(stderr,
 	    "usage: chiconv [-bug] [-i bufsiz]\n"
 	    "\t -i\tsave in-place if no error\n"
-	    "\t -f\tsave in-place (implies -i)\n"
+	    "\t -f\tsave in-place regardless of errors (implies -i)\n"
 	    "\t -b\tOutput Big5\n"
 	    "\t -u\tOutput Big5 with UAO exntension\n"
 	    "\t -g\tOutput GBK\n"
