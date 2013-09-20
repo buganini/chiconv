@@ -1,5 +1,7 @@
 Usage:
 	chiconv < infile > outfile
+	chiconv -i infile infile2 infile3
+	chiconv -f infile infile2 infile3
 
 Support encoding:
 	UTF-8
