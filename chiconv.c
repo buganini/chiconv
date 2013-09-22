@@ -177,6 +177,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	char *ib;
 	size_t len;
 	bsdconv_counter_t *e;
+	bsdconv_counter_t r=0;
 
 	ib=malloc(bufsiz);
 	len=fread(ib, 1, bufsiz, fi);
@@ -236,7 +237,10 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		bsdconv(ins);
 	}while(ins->flush==0);
 	e=bsdconv_counter(ins, "IERR");
-	return *e;
+	r+=*e;
+	e=bsdconv_counter(ins, "OERR");
+	r+=*e;
+	return r;
 }
 
 static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
