@@ -123,6 +123,10 @@ int main(int argc, char *argv[]){
 	if(optind<argc){
 		for(;optind<argc;optind++){
 			fi=fopen(argv[optind],"rb");
+			if(fi==NULL){
+				fprintf(stderr, "Failed opening file %s.\n", argv[optind]);
+				continue;
+			}
 			if(inplace==0){
 				process(fi, stdout);
 				fclose(fi);
@@ -138,7 +142,7 @@ int main(int argc, char *argv[]){
 				}
 				fo=fdopen(fd, "wb");
 				if(!fo){
-					fprintf(stderr, "Unable to open output file for %s\n", argv[optind]);
+					fprintf(stderr, "Unable to open output file for %s.\n", argv[optind]);
 					fclose(fi);
 					continue;
 				}
