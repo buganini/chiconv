@@ -24,11 +24,12 @@
 #define IBUFLEN 1024
 
 static bsdconv_counter_t process(FILE *, FILE *);
-static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len);
+static double evaluate(const char *, struct bsdconv_instance *ins, char *ib, size_t len);
 static void usage(void);
 static void finish(int r);
 
 struct codec {
+	char *name;
 	struct bsdconv_instance *evl;
 	struct bsdconv_instance *ins;
 	char *conv;
@@ -36,9 +37,10 @@ struct codec {
 	double coeff;
 };
 
-struct codec codecs[9];
-char outenc;
-size_t bufsiz;
+static struct codec codecs[9];
+static char outenc;
+static size_t bufsiz;
+static char verbose;
 
 int main(int argc, char *argv[]){
 	int ch;
@@ -52,43 +54,52 @@ int main(int argc, char *argv[]){
 	bufsiz=8192;
 	outenc ='8';
 
+	codecs[0].name="UTF-8";
 	codecs[0].evl=bsdconv_create("utf-8:score:count:null");
 	codecs[0].conv="utf-8:nobom:utf-8";
 	codecs[0].ins=NULL;
 
+	codecs[1].name="Big5";
 	codecs[1].evl=bsdconv_create("big5:score:count:null");
 	codecs[1].conv="big5:utf-8";
 	codecs[1].ins=NULL;
 
+	codecs[2].name="GBK";
 	codecs[2].evl=bsdconv_create("gbk:score:count:null");
 	codecs[2].conv="gbk:utf-8";
 	codecs[2].ins=NULL;
 
+	codecs[3].name="CCCII";
 	codecs[3].evl=bsdconv_create("cccii:score:count:null");
 	codecs[3].conv="cccii:utf-8";
 	codecs[3].ins=NULL;
 
+	codecs[4].name="UTF-16LE";
 	codecs[4].evl=bsdconv_create("utf-16le:score:count:null");
 	codecs[4].conv="utf-16le:nobom:utf-8";
 	codecs[4].ins=NULL;
 
+	codecs[5].name="UTF-16BE";
 	codecs[5].evl=bsdconv_create("utf-16be:score:count:null");
 	codecs[5].conv="utf-16be:nobom:utf-8";
 	codecs[5].ins=NULL;
 
+	codecs[6].name="UTF-32LE";
 	codecs[6].evl=bsdconv_create("utf-32le:score:count:null");
 	codecs[6].conv="utf-32le:nobom:utf-8";
 	codecs[6].ins=NULL;
 
+	codecs[7].name="UTF-32BE";
 	codecs[7].evl=bsdconv_create("utf-32be:score:count:null");
 	codecs[7].conv="utf-32be:nobom:utf-8";
 	codecs[7].ins=NULL;
 
+	codecs[8].name="GB18030";
 	codecs[8].evl=bsdconv_create("gb18030:score:count:null");
 	codecs[8].conv="gb18030:utf-8";
 	codecs[8].ins=NULL;
 
-	while ((ch = getopt(argc, argv, "ifbugs:")) != -1)
+	while ((ch = getopt(argc, argv, "ifbugs:v")) != -1)
 		switch(ch) {
 		case 'i':
 			inplace=1;
@@ -109,6 +120,9 @@ int main(int argc, char *argv[]){
 			if(sscanf(optarg, "%d", &i)!=1)
 				usage();
 			bufsiz=i;
+			break;
+		case 'v':
+			verbose=1;
 			break;
 		case '?':
 		default:
@@ -187,7 +201,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	len=fread(ib, 1, bufsiz, fi);
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
-		codecs[i].score=evaluate(codecs[i].evl, ib, len);
+		codecs[i].score=evaluate(codecs[i].name, codecs[i].evl, ib, len);
 	}
 	max=codecs[0].score;
 	max_i=0;
@@ -247,7 +261,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	return r;
 }
 
-static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
+static double evaluate(const char *name, struct bsdconv_instance *ins, char *ib, size_t len){
 	bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
 	bsdconv_counter_t *_score=bsdconv_counter(ins, "SCORE");
 	bsdconv_counter_t *_count=bsdconv_counter(ins, "COUNT");
@@ -262,18 +276,28 @@ static double evaluate(struct bsdconv_instance *ins, char *ib, size_t len){
 	double ierr=(double)(*_ierr);
 	double score=(double)(*_score);
 	double count=(double)(*_count);
-	return (score - ierr*10)/count;
+	double wv=(score - ierr*10)/count;
+	if(verbose){
+		fprintf(stderr, "%s: %.2lf\n", name, wv);
+		fprintf(stderr, "\tIERR: %.2lf\n", ierr);
+		fprintf(stderr, "\tSCORE: %.2lf\n", score);
+		fprintf(stderr, "\tCOUNT: %.2lf\n", count);
+		fprintf(stderr, "\n");
+	}
+
+	return wv;
 }
 
 static void usage(void){
 	(void)fprintf(stderr,
 	    "usage: chiconv [-bug] [-i bufsiz]\n"
-	    "\t -i\tsave in-place if no error\n"
-	    "\t -f\tsave in-place regardless of errors (implies -i)\n"
+	    "\t -i\tSave in-place if no error\n"
+	    "\t -f\tSave in-place regardless of errors (implies -i)\n"
 	    "\t -b\tOutput Big5\n"
 	    "\t -u\tOutput Big5 with UAO exntension\n"
 	    "\t -g\tOutput GBK\n"
-	    "\t -s\tbuffer size used for encoding detection, default=8192\n"
+	    "\t -s\tBuffer size used for encoding detection, default=8192\n"
+	    "\t -v\tVerbose\n"
 	);
 	finish(1);
 }
