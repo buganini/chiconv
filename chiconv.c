@@ -54,47 +54,47 @@ int main(int argc, char *argv[]){
 	outenc ='8';
 
 	codecs[0].name="UTF-8";
-	codecs[0].evl=bsdconv_create("utf-8:score:count:null");
+	codecs[0].evl=bsdconv_create("utf-8:score#default:count:null");
 	codecs[0].conv="utf-8:nobom:utf-8";
 	codecs[0].ins=NULL;
 
 	codecs[1].name="Big5";
-	codecs[1].evl=bsdconv_create("big5:score:count:null");
+	codecs[1].evl=bsdconv_create("big5:score#default:count:null");
 	codecs[1].conv="big5:utf-8";
 	codecs[1].ins=NULL;
 
 	codecs[2].name="GBK";
-	codecs[2].evl=bsdconv_create("gbk:score:count:null");
+	codecs[2].evl=bsdconv_create("gbk:score#default:count:null");
 	codecs[2].conv="gbk:utf-8";
 	codecs[2].ins=NULL;
 
 	codecs[3].name="CCCII";
-	codecs[3].evl=bsdconv_create("cccii:score:count:null");
+	codecs[3].evl=bsdconv_create("cccii:score#default:count:null");
 	codecs[3].conv="cccii:utf-8";
 	codecs[3].ins=NULL;
 
 	codecs[4].name="UTF-16LE";
-	codecs[4].evl=bsdconv_create("utf-16le:score:count:null");
+	codecs[4].evl=bsdconv_create("utf-16le:score#default:count:null");
 	codecs[4].conv="utf-16le:nobom:utf-8";
 	codecs[4].ins=NULL;
 
 	codecs[5].name="UTF-16BE";
-	codecs[5].evl=bsdconv_create("utf-16be:score:count:null");
+	codecs[5].evl=bsdconv_create("utf-16be:score#default:count:null");
 	codecs[5].conv="utf-16be:nobom:utf-8";
 	codecs[5].ins=NULL;
 
 	codecs[6].name="UTF-32LE";
-	codecs[6].evl=bsdconv_create("utf-32le:score:count:null");
+	codecs[6].evl=bsdconv_create("utf-32le:score#default:count:null");
 	codecs[6].conv="utf-32le:nobom:utf-8";
 	codecs[6].ins=NULL;
 
 	codecs[7].name="UTF-32BE";
-	codecs[7].evl=bsdconv_create("utf-32be:score:count:null");
+	codecs[7].evl=bsdconv_create("utf-32be:score#default:count:null");
 	codecs[7].conv="utf-32be:nobom:utf-8";
 	codecs[7].ins=NULL;
 
 	codecs[8].name="GB18030";
-	codecs[8].evl=bsdconv_create("gb18030:score:count:null");
+	codecs[8].evl=bsdconv_create("gb18030:score#default:count:null");
 	codecs[8].conv="gb18030:utf-8";
 	codecs[8].ins=NULL;
 
