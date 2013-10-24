@@ -190,7 +190,8 @@ int main(int argc, char *argv[]){
 static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	char *conv;
 	struct bsdconv_instance *ins;
-	int i, max, max_i;
+	int i, max_i;
+	double max;
 	char *ib;
 	size_t len;
 	bsdconv_counter_t *e;
