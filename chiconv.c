@@ -279,7 +279,7 @@ static double evaluate(const char *name, struct bsdconv_instance *ins, char *ib,
 	double ierr=(double)(*_ierr);
 	double score=(double)(*_score);
 	double count=(double)(*_count);
-	double wv=(score - ierr*10)/count;
+	double wv=(score - ierr*(count*0.01))/count;
 	if(verbose){
 		fprintf(stderr, "%s: %.2lf\n", name, wv);
 		fprintf(stderr, "\tIERR: %.2lf\n", ierr);
