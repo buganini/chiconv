@@ -34,7 +34,6 @@ struct codec {
 	struct bsdconv_instance *ins;
 	char *conv;
 	double score;
-	double coeff;
 };
 
 static struct codec codecs[9];
