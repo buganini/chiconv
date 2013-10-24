@@ -212,6 +212,9 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		}
 	}
 
+	if(verbose){
+		fprintf(stderr, "Detected encoding: %s\n", codecs[max_i].name);
+	}
 	if(codecs[max_i].ins){
 		ins=codecs[max_i].ins;
 	}else{
