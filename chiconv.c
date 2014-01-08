@@ -24,7 +24,6 @@
 #define IBUFLEN 1024
 
 static bsdconv_counter_t process(FILE *, FILE *);
-static double evaluate(const char *, struct bsdconv_instance *ins, char *ib, size_t len);
 static void usage(void);
 static void finish(int r);
 
@@ -33,7 +32,11 @@ struct codec {
 	struct bsdconv_instance *evl;
 	struct bsdconv_instance *ins;
 	char *conv;
-	double score;
+	double wv;
+	char up;
+	bsdconv_counter_t *ierr;
+	bsdconv_counter_t *score;
+	bsdconv_counter_t *count;
 };
 
 static struct codec codecs[12];
@@ -43,7 +46,7 @@ static char verbose;
 
 int main(int argc, char *argv[]){
 	int ch;
-	int i;
+	int i=0;
 	bsdconv_counter_t e;
 	char inplace=0;
 	char *tmp;
@@ -53,65 +56,77 @@ int main(int argc, char *argv[]){
 	bufsiz=8192;
 	outenc ='8';
 
-	codecs[0].name="UTF-8";
-	codecs[0].evl=bsdconv_create("utf-8:score#default:count:zhtw:big5-bonus:null");
-	codecs[0].conv="utf-8:nobom:utf-8";
-	codecs[0].ins=NULL;
+	codecs[i].name="UTF-8";
+	codecs[i].evl=bsdconv_create("utf-8:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="utf-8:nobom:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[1].name="Big5 (UAO)";
-	codecs[1].evl=bsdconv_create("big5:score#default:count:zhtw:big5-bonus:null");
-	codecs[1].conv="big5:utf-8";
-	codecs[1].ins=NULL;
+	codecs[i].name="Big5 (UAO)";
+	codecs[i].evl=bsdconv_create("big5:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="big5:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[2].name="GBK";
-	codecs[2].evl=bsdconv_create("gbk:score#default:count:zhtw:big5-bonus:null");
-	codecs[2].conv="gbk:utf-8";
-	codecs[2].ins=NULL;
+	codecs[i].name="Big5 (HKSCS 1999)";
+	codecs[i].evl=bsdconv_create("hkscs1999:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="hkscs1999:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[3].name="CCCII";
-	codecs[3].evl=bsdconv_create("cccii:score#default:count:zhtw:big5-bonus:null");
-	codecs[3].conv="cccii:utf-8";
-	codecs[3].ins=NULL;
+	codecs[i].name="Big5 (HKSCS 2001)";
+	codecs[i].evl=bsdconv_create("hkscs2001:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="hkscs2001:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[4].name="UTF-16LE";
-	codecs[4].evl=bsdconv_create("utf-16le:score#default:count:zhtw:big5-bonus:null");
-	codecs[4].conv="utf-16le:nobom:utf-8";
-	codecs[4].ins=NULL;
+	codecs[i].name="Big5 (HKSCS 2004)";
+	codecs[i].evl=bsdconv_create("hkscs2004:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="hkscs2004:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[5].name="UTF-16BE";
-	codecs[5].evl=bsdconv_create("utf-16be:score#default:count:zhtw:big5-bonus:null");
-	codecs[5].conv="utf-16be:nobom:utf-8";
-	codecs[5].ins=NULL;
+	codecs[i].name="GBK";
+	codecs[i].evl=bsdconv_create("gbk:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="gbk:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[6].name="UTF-32LE";
-	codecs[6].evl=bsdconv_create("utf-32le:score#default:count:zhtw:big5-bonus:null");
-	codecs[6].conv="utf-32le:nobom:utf-8";
-	codecs[6].ins=NULL;
+	codecs[i].name="CCCII";
+	codecs[i].evl=bsdconv_create("cccii:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="cccii:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[7].name="UTF-32BE";
-	codecs[7].evl=bsdconv_create("utf-32be:score#default:count:zhtw:big5-bonus:null");
-	codecs[7].conv="utf-32be:nobom:utf-8";
-	codecs[7].ins=NULL;
+	codecs[i].name="UTF-16LE";
+	codecs[i].evl=bsdconv_create("utf-16le:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="utf-16le:nobom:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[8].name="GB18030";
-	codecs[8].evl=bsdconv_create("gb18030:score#default:count:zhtw:big5-bonus:null");
-	codecs[8].conv="gb18030:utf-8";
-	codecs[8].ins=NULL;
+	codecs[i].name="UTF-16BE";
+	codecs[i].evl=bsdconv_create("utf-16be:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="utf-16be:nobom:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[9].name="Big5 (HKSCS 1999)";
-	codecs[9].evl=bsdconv_create("hkscs1999:score#default:count:zhtw:big5-bonus:null");
-	codecs[9].conv="hkscs1999:utf-8";
-	codecs[9].ins=NULL;
+	codecs[i].name="UTF-32LE";
+	codecs[i].evl=bsdconv_create("utf-32le:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="utf-32le:nobom:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[10].name="Big5 (HKSCS 2001)";
-	codecs[10].evl=bsdconv_create("hkscs2001:score#default:count:zhtw:big5-bonus:null");
-	codecs[10].conv="hkscs2001:utf-8";
-	codecs[10].ins=NULL;
+	codecs[i].name="UTF-32BE";
+	codecs[i].evl=bsdconv_create("utf-32be:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="utf-32be:nobom:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
 
-	codecs[11].name="Big5 (HKSCS 2004)";
-	codecs[11].evl=bsdconv_create("hkscs2004:score#default:count:zhtw:big5-bonus:null");
-	codecs[11].conv="hkscs2004:utf-8";
-	codecs[11].ins=NULL;
+	codecs[i].name="GB18030";
+	codecs[i].evl=bsdconv_create("gb18030:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].conv="gb18030:utf-i";
+	codecs[i].ins=NULL;
+	i+=1;
 
 	while ((ch = getopt(argc, argv, "ifbugs:v")) != -1)
 		switch(ch) {
@@ -147,6 +162,12 @@ int main(int argc, char *argv[]){
 	setmode(STDIN_FILENO, O_BINARY);
 	setmode(STDOUT_FILENO, O_BINARY);
 #endif
+
+	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+		codecs[i].ierr = bsdconv_counter(codecs[i].evl, "IERR");
+		codecs[i].score = bsdconv_counter(codecs[i].evl, "SCORE");
+		codecs[i].count = bsdconv_counter(codecs[i].evl, "COUNTER");
+	}
 
 	if(optind<argc){
 		for(;optind<argc;optind++){
@@ -205,25 +226,73 @@ int main(int argc, char *argv[]){
 static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	char *conv;
 	struct bsdconv_instance *ins;
-	int i, max_i;
-	double max;
+	int i, max_i=-1;
 	char *ib;
 	size_t len;
+	int candidates = sizeof(codecs)/sizeof(struct codec);
 	bsdconv_counter_t *e;
 	bsdconv_counter_t r=0;
 
 	ib=malloc(bufsiz);
-	len=fread(ib, 1, bufsiz, fi);
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
-		codecs[i].score=evaluate(codecs[i].name, codecs[i].evl, ib, len);
+		ins=codecs[i].evl;
+		bsdconv_counter_reset(ins, NULL);
+		bsdconv_init(ins);
+		codecs[i].up=1;
 	}
-	max=codecs[0].score;
-	max_i=0;
-	for(i=1;i<sizeof(codecs)/sizeof(struct codec);++i){
-		if(codecs[i].score>max){
-			max_i=i;
-			max=codecs[i].score;
+
+	int rnd=0;
+	int flush=0;
+	while(candidates > 1 && !flush){
+		rnd+=1;
+		if(verbose){
+			fprintf(stderr, "Round %d\n================================\n", rnd);
+		}
+		len=fread(ib, 1, bufsiz, fi);
+		if(feof(fi))
+			flush=1;
+		for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+			if(codecs[i].up!=1)
+				continue;
+			ins=codecs[i].evl;
+			bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
+			bsdconv_counter_t *_score=bsdconv_counter(ins, "SCORE");
+			bsdconv_counter_t *_count=bsdconv_counter(ins, "COUNT");
+			ins->input.data=ib;
+			ins->input.flags=0;
+			ins->input.next=NULL;
+			ins->input.len=len;
+			ins->flush=flush;
+			ins->output_mode=BSDCONV_NULL;
+			bsdconv(ins);
+			double ierr=(double)(*_ierr);
+			double score=(double)(*_score);
+			double count=(double)(*_count);
+			codecs[i].wv=(score - ierr*(count*0.01))/count;
+			if(verbose){
+				fprintf(stderr, "%s: %.6lf\n", codecs[i].name, codecs[i].wv);
+				fprintf(stderr, "\tIERR: %.0lf\n", ierr);
+				fprintf(stderr, "\tSCORE: %.0lf\n", score);
+				fprintf(stderr, "\tCOUNT: %.0lf\n", count);
+				fprintf(stderr, "\n");
+			}
+		}
+		for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+			if(max_i==-1){
+				max_i=i;
+				continue;
+			}
+			if(codecs[i].up!=1)
+				continue;
+			if(codecs[i].wv > codecs[max_i].wv){
+				codecs[max_i].up=0;
+				max_i=i;
+				candidates-=1;
+			}else if(codecs[i].wv < codecs[max_i].wv){
+				codecs[i].up=0;
+				candidates-=1;
+			}
 		}
 	}
 
@@ -251,6 +320,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		codecs[max_i].ins=ins=bsdconv_create(conv);
 		bsdconv_free(conv);
 	}
+	fseek(fi, 0L, SEEK_SET);
 	bsdconv_counter_reset(ins, NULL);
 	bsdconv_init(ins);
 	ins->input.data=ib;
@@ -277,33 +347,6 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	e=bsdconv_counter(ins, "OERR");
 	r+=*e;
 	return r;
-}
-
-static double evaluate(const char *name, struct bsdconv_instance *ins, char *ib, size_t len){
-	bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
-	bsdconv_counter_t *_score=bsdconv_counter(ins, "SCORE");
-	bsdconv_counter_t *_count=bsdconv_counter(ins, "COUNT");
-	bsdconv_counter_reset(ins, NULL);
-	bsdconv_init(ins);
-	ins->input.data=ib;
-	ins->input.flags=0;
-	ins->input.next=NULL;
-	ins->input.len=len;
-	ins->output_mode=BSDCONV_NULL;
-	bsdconv(ins);
-	double ierr=(double)(*_ierr);
-	double score=(double)(*_score);
-	double count=(double)(*_count);
-	double wv=(score - ierr*(count*0.01))/count;
-	if(verbose){
-		fprintf(stderr, "%s: %.2lf\n", name, wv);
-		fprintf(stderr, "\tIERR: %.2lf\n", ierr);
-		fprintf(stderr, "\tSCORE: %.2lf\n", score);
-		fprintf(stderr, "\tCOUNT: %.2lf\n", count);
-		fprintf(stderr, "\n");
-	}
-
-	return wv;
 }
 
 static void usage(void){
