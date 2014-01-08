@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 Kuan-Chung Chiu <buganini@gmail.com>
+ * Copyright (c) 2012-2014 Kuan-Chung Chiu <buganini@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -54,63 +54,63 @@ int main(int argc, char *argv[]){
 	outenc ='8';
 
 	codecs[0].name="UTF-8";
-	codecs[0].evl=bsdconv_create("utf-8:zhtw:score#default:count:big5-bonus:null");
+	codecs[0].evl=bsdconv_create("utf-8:score#default:count:zhtw:big5-bonus:null");
 	codecs[0].conv="utf-8:nobom:utf-8";
 	codecs[0].ins=NULL;
 
 	codecs[1].name="Big5 (UAO)";
-	codecs[1].evl=bsdconv_create("big5:zhtw:score#default:count:big5-bonus:null");
+	codecs[1].evl=bsdconv_create("big5:score#default:count:zhtw:big5-bonus:null");
 	codecs[1].conv="big5:utf-8";
 	codecs[1].ins=NULL;
 
 	codecs[2].name="GBK";
-	codecs[2].evl=bsdconv_create("gbk:zhtw:score#default:count:big5-bonus:null");
+	codecs[2].evl=bsdconv_create("gbk:score#default:count:zhtw:big5-bonus:null");
 	codecs[2].conv="gbk:utf-8";
 	codecs[2].ins=NULL;
 
 	codecs[3].name="CCCII";
-	codecs[3].evl=bsdconv_create("cccii:zhtw:score#default:count:big5-bonus:null");
+	codecs[3].evl=bsdconv_create("cccii:score#default:count:zhtw:big5-bonus:null");
 	codecs[3].conv="cccii:utf-8";
 	codecs[3].ins=NULL;
 
 	codecs[4].name="UTF-16LE";
-	codecs[4].evl=bsdconv_create("utf-16le:zhtw:score#default:count:big5-bonus:null");
+	codecs[4].evl=bsdconv_create("utf-16le:score#default:count:zhtw:big5-bonus:null");
 	codecs[4].conv="utf-16le:nobom:utf-8";
 	codecs[4].ins=NULL;
 
 	codecs[5].name="UTF-16BE";
-	codecs[5].evl=bsdconv_create("utf-16be:zhtw:score#default:count:big5-bonus:null");
+	codecs[5].evl=bsdconv_create("utf-16be:score#default:count:zhtw:big5-bonus:null");
 	codecs[5].conv="utf-16be:nobom:utf-8";
 	codecs[5].ins=NULL;
 
 	codecs[6].name="UTF-32LE";
-	codecs[6].evl=bsdconv_create("utf-32le:zhtw:score#default:count:big5-bonus:null");
+	codecs[6].evl=bsdconv_create("utf-32le:score#default:count:zhtw:big5-bonus:null");
 	codecs[6].conv="utf-32le:nobom:utf-8";
 	codecs[6].ins=NULL;
 
 	codecs[7].name="UTF-32BE";
-	codecs[7].evl=bsdconv_create("utf-32be:zhtw:score#default:count:big5-bonus:null");
+	codecs[7].evl=bsdconv_create("utf-32be:score#default:count:zhtw:big5-bonus:null");
 	codecs[7].conv="utf-32be:nobom:utf-8";
 	codecs[7].ins=NULL;
 
 	codecs[8].name="GB18030";
-	codecs[8].evl=bsdconv_create("gb18030:zhtw:score#default:count:big5-bonus:null");
+	codecs[8].evl=bsdconv_create("gb18030:score#default:count:zhtw:big5-bonus:null");
 	codecs[8].conv="gb18030:utf-8";
 	codecs[8].ins=NULL;
 
 	codecs[9].name="Big5 (HKSCS 1999)";
-	codecs[9].evl=bsdconv_create("hkscs1999:zhtw:score#default:count:big5-bonus:null");
-	codecs[9].conv="big5:utf-8";
+	codecs[9].evl=bsdconv_create("hkscs1999:score#default:count:zhtw:big5-bonus:null");
+	codecs[9].conv="hkscs1999:utf-8";
 	codecs[9].ins=NULL;
 
 	codecs[10].name="Big5 (HKSCS 2001)";
-	codecs[10].evl=bsdconv_create("hkscs2004:zhtw:score#default:count:big5-bonus:null");
-	codecs[10].conv="big5:utf-8";
+	codecs[10].evl=bsdconv_create("hkscs2001:score#default:count:zhtw:big5-bonus:null");
+	codecs[10].conv="hkscs2001:utf-8";
 	codecs[10].ins=NULL;
 
 	codecs[11].name="Big5 (HKSCS 2004)";
-	codecs[11].evl=bsdconv_create("hkscs2004:zhtw:score#default:count:big5-bonus:null");
-	codecs[11].conv="big5:utf-8";
+	codecs[11].evl=bsdconv_create("hkscs2004:score#default:count:zhtw:big5-bonus:null");
+	codecs[11].conv="hkscs2004:utf-8";
 	codecs[11].ins=NULL;
 
 	while ((ch = getopt(argc, argv, "ifbugs:v")) != -1)
