@@ -229,11 +229,13 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	int i, max_i=-1;
 	char *ib;
 	size_t len;
+	FILE *tmp;
 	int candidates = sizeof(codecs)/sizeof(struct codec);
 	bsdconv_counter_t *e;
 	bsdconv_counter_t r=0;
-
 	ib=malloc(bufsiz);
+
+	tmp=tmpfile();
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
 		ins=codecs[i].evl;
@@ -250,6 +252,8 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 			fprintf(stderr, "Round %d\n================================\n", rnd);
 		}
 		len=fread(ib, 1, bufsiz, fi);
+		if(tmp!=NULL)
+			fwrite(ib, len, 1, tmp);
 		if(feof(fi))
 			flush=1;
 		for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
@@ -294,6 +298,10 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 				candidates-=1;
 			}
 		}
+		if(tmp==NULL){
+			fprintf(stderr, "WARNING: Early finished because of temporary file creation failure\n");
+			break;
+		}
 	}
 
 	if(verbose){
@@ -320,20 +328,36 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		codecs[max_i].ins=ins=bsdconv_create(conv);
 		bsdconv_free(conv);
 	}
-	fseek(fi, 0L, SEEK_SET);
 	bsdconv_counter_reset(ins, NULL);
 	bsdconv_init(ins);
-	ins->input.data=ib;
-	ins->input.flags|=F_FREE;
-	ins->input.next=NULL;
-	ins->input.len=len;
-	ins->output_mode=BSDCONV_FILE;
-	ins->output.data=fo;
-	bsdconv(ins);
+
+	if(tmp==NULL){
+		ins->input.data=ib;
+		ins->input.len=len;
+		ins->input.flags=F_FREE;
+		ins->input.next=NULL;
+		ins->output_mode=BSDCONV_FILE;
+		ins->output.data=fo;
+		bsdconv(ins);
+	}else{
+		free(ib);
+		fseek(tmp, 0L, SEEK_SET);
+		do{
+			ib=malloc(IBUFLEN);
+			ins->input.len=fread(ib, 1, IBUFLEN, tmp);
+			ins->input.data=ib;
+			ins->input.flags=F_FREE;
+			ins->input.next=NULL;
+			ins->output_mode=BSDCONV_FILE;
+			ins->output.data=fo;
+			bsdconv(ins);
+		}while(!feof(tmp));
+		fclose(tmp);
+	}
 	do{
 		ib=malloc(IBUFLEN);
 		ins->input.data=ib;
-		ins->input.flags|=F_FREE;
+		ins->input.flags=F_FREE;
 		ins->input.next=NULL;
 		if((ins->input.len=fread(ib, 1, IBUFLEN, fi))==0){
 			ins->flush=1;
