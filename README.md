@@ -11,7 +11,7 @@
 	Big5 (HKSCS 2001)
 	Big5 (HKSCS 1999)
 	Big5-2003
-	Big5e
+	Big5E
 	Big5-ETEN
 	GBK
 	CCCII
