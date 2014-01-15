@@ -1,6 +1,6 @@
 PREFIX?=/usr/local
 
-CFLAGS=-Wall -I${PREFIX}/include
+CFLAGS=-g -Wall -I${PREFIX}/include
 LIBS=-L${PREFIX}/lib -lbsdconv
 
 all: chiconv
