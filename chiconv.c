@@ -92,7 +92,7 @@ int main(int argc, char *argv[]){
 	codecs[i].ins=NULL;
 	i+=1;
 
-	codecs[i].name="Big5e";
+	codecs[i].name="Big5E";
 	codecs[i].evl_conv="big5e:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5e:utf-8";
 	codecs[i].ins=NULL;
