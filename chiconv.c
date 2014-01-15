@@ -142,7 +142,7 @@ int main(int argc, char *argv[]){
 
 	codecs[i].name="GB18030";
 	codecs[i].evl_conv="gb18030:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
-	codecs[i].conv="gb18030:utf-i";
+	codecs[i].conv="gb18030:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
@@ -342,18 +342,19 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		conv=codecs[max_i].conv;
 		switch(outenc){
 			case 'b':
-				conv=bsdconv_replace_phase(conv, "_CP950,CP950-TRANS,ASCII", TO, 1);
+				conv=bsdconv_replace_phase(conv, "_CP950,CP950-TRANS,ASCII", TO, -1);
 				break;
 			case 'u':
-				conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950-TRANS,ASCII", TO, 1);
+				conv=bsdconv_replace_phase(conv, "_CP950,_UAO250,CP950-TRANS,ASCII", TO, -1);
 				break;
 			case 'g':
-				conv=bsdconv_replace_phase(conv, "_GBK,CP936-TRANS,ASCII", TO, 1);
+				conv=bsdconv_replace_phase(conv, "_GBK,CP936-TRANS,ASCII", TO, -1);
 				break;
 			default:
 				conv=strdup(conv);
 				break;
 		}
+		printf("%s\n", conv);
 		codecs[max_i].ins=ins=bsdconv_create(conv);
 		bsdconv_free(conv);
 	}
