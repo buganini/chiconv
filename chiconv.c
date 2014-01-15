@@ -31,7 +31,7 @@ struct codec {
 	char *name;
 	struct bsdconv_instance *evl;
 	struct bsdconv_instance *ins;
-	char *conv;
+	char *evl_conv, *conv;
 	double wv;
 	char up;
 	bsdconv_counter_t *ierr;
@@ -57,73 +57,91 @@ int main(int argc, char *argv[]){
 	outenc ='8';
 
 	codecs[i].name="UTF-8";
-	codecs[i].evl=bsdconv_create("utf-8:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="utf-8:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-8:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5 (UAO)";
-	codecs[i].evl=bsdconv_create("big5:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="big5:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
-	codecs[i].name="Big5 (HKSCS 1999)";
-	codecs[i].evl=bsdconv_create("hkscs1999:score#default:count:zhtw:big5-bonus:null");
-	codecs[i].conv="hkscs1999:utf-8";
-	codecs[i].ins=NULL;
-	i+=1;
-
-	codecs[i].name="Big5 (HKSCS 2001)";
-	codecs[i].evl=bsdconv_create("hkscs2001:score#default:count:zhtw:big5-bonus:null");
-	codecs[i].conv="hkscs2001:utf-8";
-	codecs[i].ins=NULL;
-	i+=1;
-
 	codecs[i].name="Big5 (HKSCS 2004)";
-	codecs[i].evl=bsdconv_create("hkscs2004:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="hkscs2004:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="hkscs2004:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
+	codecs[i].name="Big5 (HKSCS 2001)";
+	codecs[i].evl_conv="hkscs2001:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].conv="hkscs2001:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
+
+	codecs[i].name="Big5 (HKSCS 1999)";
+	codecs[i].evl_conv="hkscs1999:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].conv="hkscs1999:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
+
+	codecs[i].name="Big5-2003";
+	codecs[i].evl_conv="big5-2003:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].conv="big5-2003:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
+
+	codecs[i].name="Big5e";
+	codecs[i].evl_conv="big5e:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].conv="big5e:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
+
+	codecs[i].name="Big5-ETEN";
+	codecs[i].evl_conv="big5-eten:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].conv="big5-eten:utf-8";
+	codecs[i].ins=NULL;
+	i+=1;
+
 	codecs[i].name="GBK";
-	codecs[i].evl=bsdconv_create("gbk:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="gbk:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="gbk:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="CCCII";
-	codecs[i].evl=bsdconv_create("cccii:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="cccii:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="cccii:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-16LE";
-	codecs[i].evl=bsdconv_create("utf-16le:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="utf-16le:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-16le:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-16BE";
-	codecs[i].evl=bsdconv_create("utf-16be:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="utf-16be:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-16be:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-32LE";
-	codecs[i].evl=bsdconv_create("utf-32le:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="utf-32le:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-32le:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-32BE";
-	codecs[i].evl=bsdconv_create("utf-32be:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="utf-32be:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-32be:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="GB18030";
-	codecs[i].evl=bsdconv_create("gb18030:score#default:count:zhtw:big5-bonus:null");
+	codecs[i].evl_conv="gb18030:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="gb18030:utf-i";
 	codecs[i].ins=NULL;
 	i+=1;
@@ -164,6 +182,13 @@ int main(int argc, char *argv[]){
 #endif
 
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+		codecs[i].evl = bsdconv_create(codecs[i].evl_conv);
+		if(codecs[i].evl == NULL){
+			char *e = bsdconv_error();
+			fprintf(stderr, "WARNING: Skipping %s: %s\n", codecs[i].name, e);
+			bsdconv_free(e);
+			continue;
+		}
 		codecs[i].ierr = bsdconv_counter(codecs[i].evl, "IERR");
 		codecs[i].score = bsdconv_counter(codecs[i].evl, "SCORE");
 		codecs[i].count = bsdconv_counter(codecs[i].evl, "COUNTER");
@@ -237,26 +262,30 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 
 	tmp=tmpfile();
 
-	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
-		ins=codecs[i].evl;
+	for(i=0;i<sizeof(codecs)/sizeof(struct codec);i+=1){
+		if(codecs[i].evl == NULL){
+			codecs[i].up = 0;
+			continue;
+		}
+		ins = codecs[i].evl;
 		bsdconv_counter_reset(ins, NULL);
 		bsdconv_init(ins);
-		codecs[i].up=1;
+		codecs[i].up = 1;
 	}
 
 	int rnd=0;
 	int flush=0;
 	while(candidates > 1 && !flush){
-		rnd+=1;
+		rnd += 1;
 		if(verbose){
 			fprintf(stderr, "Round %d\n================================\n", rnd);
 		}
-		len=fread(ib, 1, bufsiz, fi);
-		if(tmp!=NULL)
+		len = fread(ib, 1, bufsiz, fi);
+		if(tmp != NULL)
 			fwrite(ib, len, 1, tmp);
 		if(feof(fi))
-			flush=1;
-		for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+			flush = 1;
+		for(i = 0;i < sizeof(codecs)/sizeof(struct codec);++i){
 			if(codecs[i].up!=1)
 				continue;
 			ins=codecs[i].evl;
@@ -390,7 +419,8 @@ static void usage(void){
 static void finish(int r){
 	int i;
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
-		bsdconv_destroy(codecs[i].evl);
+		if(codecs[i].evl)
+			bsdconv_destroy(codecs[i].evl);
 		if(codecs[i].ins)
 			bsdconv_destroy(codecs[i].ins);
 	}
