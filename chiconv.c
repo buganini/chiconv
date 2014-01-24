@@ -43,6 +43,7 @@ static struct codec codecs[12];
 static char outenc;
 static size_t bufsiz;
 static char verbose;
+static char linebreak;
 
 int main(int argc, char *argv[]){
 	int ch;
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]){
 	int fd;
 	FILE *fi, *fo;
 
+	linebreak=0;
 	bufsiz=8192;
 	outenc ='8';
 
@@ -146,7 +148,7 @@ int main(int argc, char *argv[]){
 	codecs[i].ins=NULL;
 	i+=1;
 
-	while ((ch = getopt(argc, argv, "ifbugs:v")) != -1)
+	while ((ch = getopt(argc, argv, "ifbugs:vwmx")) != -1)
 		switch(ch) {
 		case 'i':
 			inplace=1;
@@ -170,6 +172,11 @@ int main(int argc, char *argv[]){
 			break;
 		case 'v':
 			verbose=1;
+			break;
+		case 'w':
+		case 'm':
+		case 'x':
+			linebreak=ch;
 			break;
 		case '?':
 		default:
@@ -354,6 +361,17 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 				conv=strdup(conv);
 				break;
 		}
+		switch(linebreak){
+			case 'w':
+				conv=bsdconv_insert_phase(conv, "WIN", INTER, -1);
+				break;
+			case 'm':
+				conv=bsdconv_insert_phase(conv, "MAC", INTER, -1);
+				break;
+			case 'x':
+				conv=bsdconv_insert_phase(conv, "UNIX", INTER, -1);
+				break;
+		}
 		printf("%s\n", conv);
 		codecs[max_i].ins=ins=bsdconv_create(conv);
 		bsdconv_free(conv);
@@ -405,14 +423,17 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 
 static void usage(void){
 	(void)fprintf(stderr,
-	    "usage: chiconv [-bug] [-i bufsiz]\n"
-	    "\t -i\tSave in-place if no error\n"
-	    "\t -f\tSave in-place regardless of errors (implies -i)\n"
-	    "\t -b\tOutput Big5\n"
-	    "\t -u\tOutput Big5 with UAO exntension\n"
-	    "\t -g\tOutput GBK\n"
-	    "\t -s\tBuffer size used for encoding detection, default=8192\n"
-	    "\t -v\tVerbose\n"
+		"usage: chiconv [-bug] [-i bufsiz]\n"
+		"\t -i\tSave in-place if no error\n"
+		"\t -f\tSave in-place regardless of errors (implies -i)\n"
+		"\t -b\tOutput Big5\n"
+		"\t -u\tOutput Big5 with UAO exntension\n"
+		"\t -g\tOutput GBK\n"
+		"\t -s\tBuffer size used for encoding2 detection, default=8192\n"
+		"\t -v\tVerbose\n"
+		"\t -w\tUse Windows linebreak\n"
+		"\t -m\tUse Mac linebreak\n"
+		"\t -x\tUse Unix linebreak\n"
 	);
 	finish(1);
 }
