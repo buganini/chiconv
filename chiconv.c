@@ -372,7 +372,6 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 				conv=bsdconv_insert_phase(conv, "UNIX", INTER, -1);
 				break;
 		}
-		printf("%s\n", conv);
 		codecs[max_i].ins=ins=bsdconv_create(conv);
 		bsdconv_free(conv);
 	}
