@@ -259,7 +259,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 	char *conv;
 	struct bsdconv_instance *ins;
 	int i, max_i=-1;
-	char *ib;
+	char *ib, *ctmp;
 	size_t len;
 	FILE *tmp;
 	int candidates = sizeof(codecs)/sizeof(struct codec);
@@ -363,13 +363,19 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		}
 		switch(linebreak){
 			case 'w':
+				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "WIN", INTER, -1);
+				free(ctmp);
 				break;
 			case 'm':
+				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "MAC", INTER, -1);
+				free(ctmp);
 				break;
 			case 'x':
+				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "UNIX", INTER, -1);
+				free(ctmp);
 				break;
 		}
 		codecs[max_i].ins=ins=bsdconv_create(conv);
