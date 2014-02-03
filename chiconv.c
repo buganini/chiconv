@@ -34,9 +34,6 @@ struct codec {
 	char *evl_conv, *conv;
 	double wv;
 	char up;
-	bsdconv_counter_t *ierr;
-	bsdconv_counter_t *score;
-	bsdconv_counter_t *count;
 };
 
 static struct codec codecs[12];
@@ -196,9 +193,6 @@ int main(int argc, char *argv[]){
 			bsdconv_free(e);
 			continue;
 		}
-		codecs[i].ierr = bsdconv_counter(codecs[i].evl, "IERR");
-		codecs[i].score = bsdconv_counter(codecs[i].evl, "SCORE");
-		codecs[i].count = bsdconv_counter(codecs[i].evl, "COUNTER");
 	}
 
 	if(optind<argc){
