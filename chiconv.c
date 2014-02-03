@@ -59,91 +59,91 @@ int main(int argc, char *argv[]){
 	outenc ='8';
 
 	codecs[i].name="UTF-8";
-	codecs[i].evl_conv="utf-8:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="utf-8:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-8:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5 (UAO)";
-	codecs[i].evl_conv="big5:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="big5:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5 (HKSCS 2004)";
-	codecs[i].evl_conv="hkscs2004:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="hkscs2004:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="hkscs2004:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5 (HKSCS 2001)";
-	codecs[i].evl_conv="hkscs2001:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="hkscs2001:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="hkscs2001:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5 (HKSCS 1999)";
-	codecs[i].evl_conv="hkscs1999:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="hkscs1999:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="hkscs1999:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5-2003";
-	codecs[i].evl_conv="big5-2003:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="big5-2003:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5-2003:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5E";
-	codecs[i].evl_conv="big5e:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="big5e:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5e:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="Big5-ETEN";
-	codecs[i].evl_conv="big5-eten:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="big5-eten:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="big5-eten:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="GBK";
-	codecs[i].evl_conv="gbk:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="gbk:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="gbk:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="CCCII";
-	codecs[i].evl_conv="cccii:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="cccii:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="cccii:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-16LE";
-	codecs[i].evl_conv="utf-16le:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="utf-16le:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-16le:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-16BE";
-	codecs[i].evl_conv="utf-16be:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="utf-16be:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-16be:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-32LE";
-	codecs[i].evl_conv="utf-32le:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="utf-32le:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-32le:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="UTF-32BE";
-	codecs[i].evl_conv="utf-32be:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="utf-32be:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="utf-32be:nobom:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
 
 	codecs[i].name="GB18030";
-	codecs[i].evl_conv="gb18030:score#default:count:zh-bonus:zhtw:zh-bonus-phrase:null";
+	codecs[i].evl_conv="gb18030:score#with=cjk:count:zh-bonus:zhtw:zh-bonus-phrase:null";
 	codecs[i].conv="gb18030:utf-8";
 	codecs[i].ins=NULL;
 	i+=1;
