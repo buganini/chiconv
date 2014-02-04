@@ -359,17 +359,17 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 			case 'w':
 				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "WIN", INTER, -1);
-				free(ctmp);
+				bsdconv_free(ctmp);
 				break;
 			case 'm':
 				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "MAC", INTER, -1);
-				free(ctmp);
+				bsdconv_free(ctmp);
 				break;
 			case 'x':
 				ctmp=conv;
 				conv=bsdconv_insert_phase(conv, "UNIX", INTER, -1);
-				free(ctmp);
+				bsdconv_free(ctmp);
 				break;
 		}
 		codecs[max_i].ins=ins=bsdconv_create(conv);
