@@ -2,7 +2,7 @@ DESTDIR?=
 PREFIX?=/usr/local
 LOCALBASE?=${PREFIX}
 
-CFLAGS=-g -Wall -I${LOCALBASE}/include
+CFLAGS=-Wall -I${LOCALBASE}/include -O2
 LIBS=-L${LOCALBASE}/lib -lbsdconv
 
 all: chiconv
