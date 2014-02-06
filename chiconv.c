@@ -36,7 +36,7 @@ struct codec {
 	char up;
 };
 
-static struct codec codecs[12];
+static struct codec codecs[15];
 static char outenc;
 static size_t bufsiz;
 static char verbose;
