@@ -44,12 +44,14 @@ static char linebreak;
 
 int main(int argc, char *argv[]){
 	int ch;
-	int i=0;
+	int i = 0;
 	bsdconv_counter_t e;
-	char inplace=0;
+	char inplace = 0;
 	char *tmp;
 	int fd;
 	FILE *fi, *fo;
+	char enable_hkscs = 0;
+	int hkscs[] = {2, 3, 4};
 
 	linebreak=0;
 	bufsiz=8192;
@@ -145,7 +147,7 @@ int main(int argc, char *argv[]){
 	codecs[i].ins=NULL;
 	i+=1;
 
-	while ((ch = getopt(argc, argv, "ifbugs:vwmx")) != -1)
+	while ((ch = getopt(argc, argv, "ifbugks:vwmx")) != -1)
 		switch(ch) {
 		case 'i':
 			inplace=1;
@@ -161,6 +163,9 @@ int main(int argc, char *argv[]){
 			break;
 		case 'g':
 			outenc='g';
+			break;
+		case 'k':
+			enable_hkscs=1;
 			break;
 		case 's':
 			if(sscanf(optarg, "%d", &i)!=1)
@@ -185,7 +190,14 @@ int main(int argc, char *argv[]){
 	setmode(STDOUT_FILENO, O_BINARY);
 #endif
 
+	if(!enable_hkscs){
+		for(i=0;i<sizeof(hkscs)/sizeof(hkscs[0]);i+=1){
+			codecs[hkscs[i]].evl_conv=NULL;
+		}
+	}
 	for(i=0;i<sizeof(codecs)/sizeof(struct codec);++i){
+		if(codecs[i].evl_conv==NULL)
+			continue;
 		codecs[i].evl = bsdconv_create(codecs[i].evl_conv);
 		if(codecs[i].evl == NULL){
 			char *e = bsdconv_error();
@@ -287,7 +299,7 @@ static bsdconv_counter_t process(FILE *fi, FILE *fo){
 		if(feof(fi))
 			flush = 1;
 		for(i = 0;i < sizeof(codecs)/sizeof(struct codec);++i){
-			if(codecs[i].up!=1)
+			if(codecs[i].up!=1 || codecs[i].evl_conv==NULL)
 				continue;
 			ins=codecs[i].evl;
 			bsdconv_counter_t *_ierr=bsdconv_counter(ins, "IERR");
@@ -428,6 +440,7 @@ static void usage(void){
 		"\t -b\tOutput Big5\n"
 		"\t -u\tOutput Big5 with UAO exntension\n"
 		"\t -g\tOutput GBK\n"
+		"\t -k\tEnable HKSCS\n"
 		"\t -s\tBuffer size used for encoding2 detection, default=8192\n"
 		"\t -v\tVerbose\n"
 		"\t -w\tUse Windows linebreak\n"
